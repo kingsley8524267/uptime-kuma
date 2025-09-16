@@ -124,6 +124,9 @@ async function createTables() {
         table.integer("resend_interval").notNullable().defaultTo(0);
         table.integer("packet_size").notNullable().defaultTo(56);
         table.string("game", 255);
+        //[CUSTOM: http_psc] start: modify db
+        table.integer("psc").notNullable().defaultTo(0);
+        //[CUSTOM: http_psc] start: modify db
     });
 
     // heartbeat

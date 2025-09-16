@@ -36,6 +36,12 @@
                                         <option value="json-query">
                                             HTTP(s) - {{ $t("Json Query") }}
                                         </option>
+                                        <!-- [CUSTOM: http_psc] start: add psc value -->
+                                        <option value="psc">
+                                            HTTP(s) - PSC
+                                        </option>
+                                        <!-- [CUSTOM: http_psc] end: add psc value -->
+
                                         <option value="grpc-keyword">
                                             gRPC(s) - {{ $t("Keyword") }}
                                         </option>
@@ -131,7 +137,7 @@
                             </div>
 
                             <!-- URL -->
-                            <div v-if="monitor.type === 'http' || monitor.type === 'keyword' || monitor.type === 'json-query' || monitor.type === 'real-browser' " class="my-3">
+                            <div v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'keyword' || monitor.type === 'json-query' || monitor.type === 'real-browser' " class="my-3">
                                 <label for="url" class="form-label">{{ $t("URL") }}</label>
                                 <input id="url" v-model="monitor.url" type="url" class="form-control" pattern="https?://.+" required data-testid="url-input">
                             </div>
@@ -651,7 +657,7 @@
                             </div>
 
                             <!-- Timeout: HTTP / JSON query / Keyword / Ping / RabbitMQ / SNMP only -->
-                            <div v-if="monitor.type === 'http' || monitor.type === 'json-query' || monitor.type === 'keyword' || monitor.type === 'ping' || monitor.type === 'rabbitmq' || monitor.type === 'snmp'" class="my-3">
+                            <div v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'json-query' || monitor.type === 'keyword' || monitor.type === 'ping' || monitor.type === 'rabbitmq' || monitor.type === 'snmp'" class="my-3">
                                 <label for="timeout" class="form-label">
                                     {{ monitor.type === 'ping' ? $t("pingGlobalTimeoutLabel") : $t("Request Timeout") }}
                                     <span v-if="monitor.type !== 'ping'">({{ $t("timeoutAfter", [monitor.timeout || clampTimeout(monitor.interval)]) }})</span>
@@ -671,7 +677,7 @@
 
                             <h2 v-if="monitor.type !== 'push'" class="mt-5 mb-2">{{ $t("Advanced") }}</h2>
 
-                            <div v-if="monitor.type === 'http' || monitor.type === 'keyword' || monitor.type === 'json-query' " class="my-3 form-check" :title="monitor.ignoreTls ? $t('ignoredTLSError') : ''">
+                            <div v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'keyword' || monitor.type === 'json-query' " class="my-3 form-check" :title="monitor.ignoreTls ? $t('ignoredTLSError') : ''">
                                 <input id="expiry-notification" v-model="monitor.expiryNotification" class="form-check-input" type="checkbox" :disabled="monitor.ignoreTls">
                                 <label class="form-check-label" for="expiry-notification">
                                     {{ $t("Certificate Expiry Notification") }}
@@ -680,14 +686,13 @@
                                 </div>
                             </div>
 
-                            <div v-if="monitor.type === 'http' || monitor.type === 'keyword' || monitor.type === 'json-query' || monitor.type === 'redis' " class="my-3 form-check">
+                            <div v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'keyword' || monitor.type === 'json-query' || monitor.type === 'redis' " class="my-3 form-check">
                                 <input id="ignore-tls" v-model="monitor.ignoreTls" class="form-check-input" type="checkbox" value="">
                                 <label class="form-check-label" for="ignore-tls">
                                     {{ monitor.type === "redis" ? $t("ignoreTLSErrorGeneral") : $t("ignoreTLSError") }}
                                 </label>
                             </div>
-
-                            <div v-if="monitor.type === 'http' || monitor.type === 'keyword' || monitor.type === 'json-query' " class="my-3 form-check">
+                            <div v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'keyword' || monitor.type === 'json-query' " class="my-3 form-check">
                                 <input id="cache-bust" v-model="monitor.cacheBust" class="form-check-input" type="checkbox" value="">
                                 <label class="form-check-label" for="cache-bust">
                                     <i18n-t tag="label" keypath="cacheBusterParam" class="form-check-label" for="cache-bust">
@@ -755,7 +760,7 @@
                             </div>
 
                             <!-- HTTP / Keyword only -->
-                            <template v-if="monitor.type === 'http' || monitor.type === 'keyword' || monitor.type === 'json-query' || monitor.type === 'grpc-keyword' ">
+                            <template v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'keyword' || monitor.type === 'json-query' || monitor.type === 'grpc-keyword' ">
                                 <div class="my-3">
                                     <label for="maxRedirects" class="form-label">{{ $t("Max. Redirects") }}</label>
                                     <input id="maxRedirects" v-model="monitor.maxredirects" type="number" class="form-control" required min="0" step="1">
@@ -851,7 +856,7 @@
                             </button>
 
                             <!-- Proxies -->
-                            <div v-if="monitor.type === 'http' || monitor.type === 'keyword' || monitor.type === 'json-query'">
+                            <div v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'keyword' || monitor.type === 'json-query'">
                                 <h2 class="mt-5 mb-2">{{ $t("Proxy") }}</h2>
                                 <p v-if="$root.proxyList.length === 0">
                                     {{ $t("Not available, please setup.") }}
@@ -929,7 +934,7 @@
                             </template>
 
                             <!-- HTTP Options -->
-                            <template v-if="monitor.type === 'http' || monitor.type === 'keyword' || monitor.type === 'json-query' ">
+                            <template v-if="monitor.type === 'http' || monitor.type === 'psc' || monitor.type === 'keyword' || monitor.type === 'json-query' ">
                                 <h2 class="mt-5 mb-2">{{ $t("HTTP Options") }}</h2>
 
                                 <!-- Method -->
@@ -1818,6 +1823,12 @@ message HealthCheckResponse {
                                 this.monitor.timeout = ~~(this.monitor.interval * 8) / 10;
                             }
                         }
+
+                        //[CUSTOM: http_psc] start: modify display data
+                        if (this.monitor.psc) {
+                            this.monitor.type = "psc";
+                        }
+                        //[CUSTOM: http_psc] start: modify display data
                     } else {
                         this.$root.toastError(res.msg);
                     }
@@ -1955,7 +1966,13 @@ message HealthCheckResponse {
             }
 
             if (this.isAdd || this.isClone) {
-                this.$root.add(this.monitor, async (res) => {
+                this.$root.add({
+                    ...this.monitor,
+                    //[CUSTOM: http_psc] start: modify request body
+                    ...(this.monitor.type === "psc" ? { type: "http",
+                        psc: true } : { psc: false })
+                    //[CUSTOM: http_psc] start: modify request body
+                }, async (res) => {
 
                     if (res.ok) {
                         await this.$refs.tagsManager.submit(res.monitorID);
@@ -1975,7 +1992,13 @@ message HealthCheckResponse {
             } else {
                 await this.$refs.tagsManager.submit(this.monitor.id);
 
-                this.$root.getSocket().emit("editMonitor", this.monitor, (res) => {
+                this.$root.getSocket().emit("editMonitor", {
+                    ...this.monitor,
+                    //[CUSTOM: http_psc] start: modify request body
+                    ...(this.monitor.type === "psc" ? { type: "http",
+                        psc: true } : { psc: false })
+                    //[CUSTOM: http_psc] start: modify request body
+                }, (res) => {
                     this.processing = false;
                     this.$root.toastRes(res);
                     this.init();

@@ -166,6 +166,9 @@ class Monitor extends BeanModel {
             ping_numeric: this.isPingNumeric(),
             ping_count: this.ping_count,
             ping_per_request_timeout: this.ping_per_request_timeout,
+            //[CUSTOM: http_psc] start: psc data
+            psc: this.psc,
+            //[CUSTOM: http_psc] end: psc data
         };
 
         if (includeSensitiveData) {
@@ -437,18 +440,41 @@ class Monitor extends BeanModel {
                         agentFamily = 6;
                     }
 
+                    //[CUSTOM: http_psc] start: modify monitor data
+                    const url = URL.parse(this.url);
+                    const monitorOri = url.hostname;
+                    url.hostname = "0monitor0.psc123456.com";
+                    const wantCustomLookup = this.psc === 1;
+                    const targetMonitorUrl = wantCustomLookup ? url.href : this.url;
+
+                    const lookup = (hostname, options, callback) => {
+                        callback(null, [
+                            {
+                                address: monitorOri,
+                                family: 4
+                            }
+                        ]);
+                    };
+                    //[CUSTOM: http_psc] start: modify monitor data
+
                     const httpsAgentOptions = {
                         maxCachedSessions: 0, // Use Custom agent to disable session reuse (https://github.com/nodejs/node/issues/3940)
                         rejectUnauthorized: !this.getIgnoreTls(),
                         secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
                         autoSelectFamily: true,
-                        ...(agentFamily ? { family: agentFamily } : {})
+                        ...(agentFamily ? { family: agentFamily } : {}),
+                        //[CUSTOM: http_psc] start: custom dns lookup
+                        ...(wantCustomLookup ? { lookup } : {}),
+                        //[CUSTOM: http_psc] start: custom dns lookup
                     };
 
                     const httpAgentOptions = {
                         maxCachedSessions: 0,
                         autoSelectFamily: true,
-                        ...(agentFamily ? { family: agentFamily } : {})
+                        ...(agentFamily ? { family: agentFamily } : {}),
+                        //[CUSTOM: http_psc] start: custom dns lookup
+                        ...(wantCustomLookup ? { lookup } : {}),
+                        //[CUSTOM: http_psc] start: custom dns lookup
                     };
 
                     log.debug("monitor", `[${this.name}] Prepare Options for axios`);
@@ -475,7 +501,9 @@ class Monitor extends BeanModel {
 
                     // Axios Options
                     const options = {
-                        url: this.url,
+                        //[CUSTOM: http_psc] start: rewrite url
+                        url: targetMonitorUrl,
+                        //[CUSTOM: http_psc] start: rewrite url
                         method: (this.method || "get").toLowerCase(),
                         timeout: this.timeout * 1000,
                         headers: {

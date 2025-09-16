@@ -897,6 +897,9 @@ let needSetup = false;
                 bean.ping_per_request_timeout = monitor.ping_per_request_timeout;
 
                 bean.validate();
+                //[CUSTOM: http_psc] start: modify monitor data
+                bean.psc = monitor.psc ? 1 : 0;
+                //[CUSTOM: http_psc] start: modify monitor data
 
                 await R.store(bean);
 
